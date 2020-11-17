@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', getPosts);
 // Listen for add post
 document.querySelector('.post-submit').addEventListener('click', addPost);
 
+// Listen for delete post
+document.querySelector('#posts').addEventListener('click', deletePost);
+
 // Get Posts
 function getPosts(){
     http.get('http://localhost:3000/posts')
@@ -30,4 +33,18 @@ function addPost(){
         getPosts();
     })
     .catch(err => console.log(err));
+}
+
+//Delete Posts
+function deletePost(e){
+    e.preventDefault();
+    if(e.target.classList.contains('fa-times')){
+    const id = e.target.parentElement.dataset.id;
+    http.delete(`http://localhost:3000/posts/${id}`)
+        .then(data => {
+            getPosts();
+        })
+        // .then(data => console.log(data))
+        .catch(err => console.log(err));
+        }
 }

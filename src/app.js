@@ -38,7 +38,7 @@ function addPost(){
 //Delete Posts
 function deletePost(e){
     e.preventDefault();
-    if(e.target.classList.contains('fa-times')){
+    if(e.target.parentElement.classList.contains('delete')){
     const id = e.target.parentElement.dataset.id;
     http.delete(`http://localhost:3000/posts/${id}`)
         .then(data => {

@@ -8,13 +8,16 @@ import { ui } from './ui';
 document.addEventListener('DOMContentLoaded', getPosts);
 
 // Listen for add post
-document.querySelector('.post-submit').addEventListener('click', addPost);
+document.querySelector('.post-submit').addEventListener('click', submitPost);
 
 // Listen for delete post
 document.querySelector('#posts').addEventListener('click', deletePost);
 
 // Listen for edit state
 document.querySelector('#posts').addEventListener('click', enableEdit);
+
+// Listen for cancel edit state
+document.querySelector('.card-form').addEventListener('click', cancelEdit);
 
 
 // Get Posts
@@ -25,18 +28,41 @@ function getPosts(){
 }
 
 // Add Posts
-function addPost(){
-    http.post('http://localhost:3000/posts',{
-        "id": document.getElementById('id').value,
-        "title": document.getElementById('title').value,
-        "body": document.getElementById('body').value
-    })
-    .then(data => {
-        ui.showAlert('Post added', 'alert alert-success');
-        ui.clearFields();
-        getPosts();
-    })
-    .catch(err => console.log(err));
+function submitPost(){
+    const id = document.getElementById('#id').value;
+    const title = document.getElementById('#title').value;
+    const body = document.getElementById('#body').value;
+
+    const data = {
+            id,
+            title,
+            body
+        }
+    
+    // Validate input
+    if(title === '' || body === ''){
+        ui.showAlert('Please fill all the fields', 'alert alert-danger');
+    } else {
+        // Check for id
+        if(id === ''){
+            http.post('http://localhost:3000/posts', data)
+        .then(data => {
+            ui.showAlert('Post added', 'alert alert-success');
+            ui.clearFields();
+            getPosts();
+        })
+        .catch(err => console.log(err));
+        }else{
+            // Update Post
+            http.put(`http://localhost:3000/posts/${id}`, data)
+            .then(data => {
+                ui.showAlert('Post updated', 'alert alert-success');
+                ui.changeFormState('add');
+                getPosts();
+        })
+        .catch(err => console.log(err));
+        }        
+    }
 }
 
 // Delete Posts
@@ -72,4 +98,13 @@ function enableEdit(e){
         // Fill form with the current post
         ui.fillForm(data);
     }
+    e.preventDefault();
+}
+
+// Cancel edit state
+function cancelEdit(e){
+    if(e.target.classList.contains('post-cancel')){
+        ui.changeFormState('add')
+    }
+    e.preventDefault();
 }
